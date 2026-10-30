@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#050d1a">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="Voe por 20 céus vistos de cima: desvie de montanhas, raios e meteoros, colete joias e cace coelhos.">
+<title>Voo dos 20 Céus</title>
+<link rel="icon" type="image/png" href="assets/icon-192.png">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<link rel="preload" href="fonts/barlow-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+  <div id="stage">
+    <canvas id="cv" role="img" aria-label="Águia voando sobre o terreno, vista de cima"></canvas>
+
+    <!-- HUD durante o jogo -->
+    <div id="hud" hidden>
+      <div class="hud-top">
+        <div id="hearts" class="hearts" role="img" aria-label="Vidas"><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="hud-score"><img src="assets/gem1.png" alt=""><b id="score">0</b></div>
+        <button id="btnPause" class="iconbtn" type="button" aria-label="Pausar">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor"/><rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor"/></svg>
+        </button>
+      </div>
+      <div id="levelPill" class="pill">NÍVEL 1</div>
+      <div class="bar" aria-hidden="true"><i id="bar"></i></div>
+    </div>
+    <div id="banner" class="banner" aria-live="polite"></div>
+
+    <!-- Carregando -->
+    <section id="sc-loading" class="screen center">
+      <div class="loading">
+        <div class="title small">Águia</div>
+        <div class="meter" aria-hidden="true"><i id="loadBar"></i></div>
+        <p id="loadMsg" class="mut">Preparando o voo…</p>
+        <button id="btnRetry" class="btn" type="button" hidden>Tentar de novo</button>
+      </div>
+    </section>
+
+    <!-- Menu -->
+    <section id="sc-menu" class="screen menu" hidden>
+      <header>
+        <h1 class="title">Águia</h1>
+        <p class="subtitle">Voo dos 20 céus</p>
+      </header>
+      <nav class="stack" aria-label="Menu principal">
+        <button id="btnContinue" class="btn primary" type="button" hidden></button>
+        <button id="btnNew" class="btn" type="button">Novo jogo</button>
+        <button id="btnRank" class="btn" type="button">Ranking</button>
+        <button id="btnHow" class="btn" type="button">Como jogar</button>
+        <button id="btnSound" class="btn ghost" type="button" aria-pressed="false">Som: ligado</button>
+      </nav>
+      <p class="hint">Arraste o dedo ou o mouse para voar</p>
+    </section>
+
+    <!-- Como jogar -->
+    <section id="sc-how" class="screen dim" hidden>
+      <div class="card">
+        <h2>Como jogar</h2>
+        <p class="lead">Arraste em qualquer ponto da tela: a águia acompanha o movimento do seu dedo. No teclado, use as setas ou WASD. <kbd>P</kbd> ou <kbd>Esc</kbd> pausam.</p>
+        <ul class="legend">
+          <li><span class="ico gems"><img src="assets/gem0.png" alt=""><img src="assets/gem1.png" alt=""><img src="assets/gem2.png" alt=""></span><span><b>Joias</b> valem 10, 25 e 50 pontos.</span></li>
+          <li><span class="ico"><img src="assets/rabbit.png" alt=""></span><span><b>Coelhos</b> fogem de você. Pegue um para ganhar 150 pontos e 1 vida.</span></li>
+          <li><span class="ico"><img src="assets/mount.png" alt=""></span><span><b>Montanhas</b> tiram 1 vida. Sempre há uma passagem livre.</span></li>
+          <li><span class="ico"><img src="assets/storm.png" alt=""></span><span><b>Tempestades</b> (nível 3) lançam raios. O anel amarelo mostra onde vai cair.</span></li>
+          <li><span class="ico"><img src="assets/hawk1.png" alt=""></span><span><b>Gaviões</b> (nível 4) perseguem você.</span></li>
+          <li><span class="ico"><img src="assets/meteor.png" alt=""></span><span><b>Meteoros</b> (nível 13) avisam com uma linha vermelha antes de cair.</span></li>
+        </ul>
+        <p class="lead">Cada nível dura 30 segundos e dá bônus. Zerar o nível 20 vale 2.000 pontos extras.</p>
+        <button class="btn primary back" type="button" data-back>Entendi</button>
+      </div>
+    </section>
+
+    <!-- Ranking -->
+    <section id="sc-rank" class="screen dim" hidden>
+      <div class="card">
+        <h2>Ranking</h2>
+        <div id="rankTabs" class="tabs" role="tablist" hidden>
+          <button id="tabGlobal" type="button" role="tab" aria-selected="true">Global</button>
+          <button id="tabLocal" type="button" role="tab" aria-selected="false">Neste aparelho</button>
+        </div>
+        <p id="rankSrc" class="mut small"></p>
+        <ol id="rankRows" class="rows" aria-live="polite"></ol>
+        <button class="btn primary back" type="button" data-back>Voltar</button>
+      </div>
+    </section>
+
+    <!-- Pausa -->
+    <section id="sc-pause" class="screen dim center" hidden>
+      <div class="card narrow">
+        <h2>Pausado</h2>
+        <div class="stack">
+          <button id="btnResume" class="btn primary" type="button">Continuar</button>
+          <button id="btnSound2" class="btn" type="button" aria-pressed="false">Som: ligado</button>
+          <button id="btnMenu" class="btn ghost" type="button">Menu (o progresso é salvo)</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Fim de jogo -->
+    <section id="sc-over" class="screen dim center" hidden>
+      <div class="card narrow">
+        <h2 id="overTitle">Fim de jogo</h2>
+        <p class="big"><b id="overScore">0</b> pontos</p>
+        <p id="overLevel" class="mut">Nível 1 de 20</p>
+        <form id="nameForm" class="nameform" autocomplete="off">
+          <label for="nameIn">Seu nome no ranking</label>
+          <div class="row">
+            <input id="nameIn" name="nome" type="text" maxlength="12" placeholder="Jogador" enterkeyhint="done" autocapitalize="words" spellcheck="false">
+            <button id="btnSave" class="btn primary" type="submit">Salvar</button>
+          </div>
+        </form>
+        <p id="overMsg" class="msg" role="status"></p>
+        <div class="stack">
+          <button id="btnAgain" class="btn primary" type="button">Jogar de novo</button>
+          <button id="btnRank2" class="btn" type="button">Ranking</button>
+          <button id="btnMenu2" class="btn ghost" type="button">Menu</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- Aparelho deitado -->
+<div id="rotate" hidden>
+  <svg viewBox="0 0 64 64" width="64" height="64" aria-hidden="true"><rect x="20" y="6" width="24" height="44" rx="4" fill="none" stroke="currentColor" stroke-width="3"/><path d="M12 54c8 6 24 6 36-2m0 0-7-1m7 1 1-7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <p>Gire o aparelho para jogar em pé.</p>
+</div>
+
+<noscript><p style="padding:2em;color:#fff;font-family:sans-serif">Este jogo precisa de JavaScript para funcionar.</p></noscript>
+
+<script src="ranking-config.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/ranking.js"></script>
+<script src="js/game.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
